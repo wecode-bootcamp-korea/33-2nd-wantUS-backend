@@ -1,5 +1,5 @@
 from pathlib import Path
-from my_settings import SECRET_KEY, DATABASES, ALGORITHM
+from my_settings import GOOGLE_CLIENT_SECRET, GOOGLE_CLIENT_ID, KAKAO_CLIENT_ID, SECRET_KEY, DATABASES, ALGORITHM
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -15,7 +15,6 @@ SECRET_KEY = SECRET_KEY
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -147,3 +146,25 @@ CORS_ALLOW_HEADERS = (
 )
 
 ALGORITHM = ALGORITHM
+
+LOGGING = {
+    'disable_existing_loggers': False,
+    'version': 1,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG',
+        },
+    },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
+
+KAKAO_CLIENT_ID      = KAKAO_CLIENT_ID
+GOOGLE_CLIENT_ID     = GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET = GOOGLE_CLIENT_SECRET

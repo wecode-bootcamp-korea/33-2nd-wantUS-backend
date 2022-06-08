@@ -4,14 +4,11 @@ from django.conf import settings
 
 from users.models    import User
 
-
-
-def access_token_check(func):
+def signin_decorator(func):
     def wrapper(self,request,*args,**kwargs):
         try:
             access_token = request.headers.get('Authorization')
             payload      = jwt.decode(access_token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
-            
             request.user = User.objects.get(id = payload['id'])
 
             return func(self,request,*args,**kwargs)
