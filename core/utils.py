@@ -15,7 +15,7 @@ def signin_decorator(func):
             return func(self,request,*args,**kwargs)
 
         except User.DoesNotExist:
-            return JsonResponse({'message' : 'INVALID_USER'}, status=40)
+            return JsonResponse({'message' : 'INVALID_USER'}, status=400)
         
         except jwt.ExpiredSignatureError:
             return JsonResponse({'message' : 'Expired_Signature'}, status=401)
