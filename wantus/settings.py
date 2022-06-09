@@ -1,5 +1,5 @@
 from pathlib import Path
-from my_settings import GOOGLE_CLIENT_SECRET, GOOGLE_CLIENT_ID, KAKAO_CLIENT_ID, NAVER_CLIENT_ID, NAVER_CLIENT_SECRET, SECRET_KEY, DATABASES, ALGORITHM
+from my_settings import GOOGLE_CLIENT_SECRET, GOOGLE_CLIENT_ID, KAKAO_CLIENT_ID, SECRET_KEY, DATABASES, ALGORITHM, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,11 +27,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'django_extensions',
-    'core',
+    'core', 
     'users',
     'jobs',
     'applications',
-    'resumes',
+    'resumes'
+    'storages'
 ]
 
 MIDDLEWARE = [
@@ -96,7 +97,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
@@ -168,5 +169,14 @@ LOGGING = {
 KAKAO_CLIENT_ID      = KAKAO_CLIENT_ID
 GOOGLE_CLIENT_ID     = GOOGLE_CLIENT_ID
 GOOGLE_CLIENT_SECRET = GOOGLE_CLIENT_SECRET
-NAVER_CLIENT_ID      = NAVER_CLIENT_ID
-NAVER_CLIENT_SECRET  = NAVER_CLIENT_SECRET
+AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
+AWS_STORAGE_BUCKET_NAME = 'abstunator-wantus-resume-bucket'
+
+AWS_S3_FILE_OVERWRITE = False
+# set this to false, because you don't want files to be overwritten 
+AWS_DEFAULT_ACL = None
+# minimal default settings
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# because of the code above, all files are served from the s3 bucket 
