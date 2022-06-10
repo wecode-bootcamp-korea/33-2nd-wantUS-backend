@@ -19,7 +19,6 @@ class KakaoSignInTest(TestCase):
             profile_image     = 'http://k.kakaocdn.net/dn/eeTOt3/btrtLULVtEZ/5EXNjngEhg1QeAgUE3KKAk/img_640x640.jpg',
             email             = 'kim1234@gmail.com',
             social_account_id = '12345678',
-            terms_agreements  = {1:2},
             social_id         = Social.objects.get(name="kakao").id,
         )
 
@@ -120,7 +119,6 @@ class GoogleSignInTest(TestCase):
             profile_image     = 'https://lh3.googleusercontent.com/a/AATXAJyJ31Yj38kTInJgJ4ducCl6Wx-QlX49FzQh0kF9=s96-c',
             email             = 'gogolee@gmail.com',
             social_account_id = '5544332211',
-            terms_agreements  = {1:2},
             social_id         = Social.objects.get(name="google").id,
         )
 

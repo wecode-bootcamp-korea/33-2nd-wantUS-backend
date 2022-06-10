@@ -22,10 +22,12 @@ class Location(models.Model):
         db_table = "locations"
 
 class Company(models.Model): 
-    name     = models.CharField(max_length=45)
-    address  = models.CharField(max_length=200)
-    logo     = models.URLField(max_length=500)
-    location = models.ForeignKey('Location', on_delete=models.CASCADE)
+    name      = models.CharField(max_length=45)
+    address   = models.CharField(max_length=200)
+    logo      = models.URLField(max_length=500)
+    location  = models.ForeignKey('Location', on_delete=models.CASCADE)
+    latitude  = models.DecimalField(max_digits= 8, decimal_places=5, null=True)
+    longitude = models.DecimalField(max_digits= 8, decimal_places=5, null=True)
 
     class Meta: 
         db_table = "companies"
