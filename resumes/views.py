@@ -60,3 +60,19 @@ class ResumeView(View):
         except Resume.DoesNotExist:
             return JsonResponse({'message' : 'INVALID_RESUME_ID'}, status=404)
     
+      # 파일 삭제 
+    @signin_decorator
+    def delete (self,request,resume_id):
+        try: 
+
+            user   = request.user
+            resume = Resume.objects.get(id = resume_id)
+
+            if user.id != resume.user.id:
+                return JsonResponse({'message' : 'INVALID_USER'}, status=400)
+
+            resume.delete()
+            return JsonResponse({'message' : 'SUCCESS'}, status=200)
+
+        except Resume.DoesNotExist:
+            return JsonResponse({'message' : 'INVALID_USER'}, status=400)
