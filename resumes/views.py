@@ -60,7 +60,7 @@ class ResumeView(View):
         except Resume.DoesNotExist:
             return JsonResponse({'message' : 'INVALID_RESUME_ID'}, status=404)
     
-      # 파일 삭제 
+    # 파일 삭제 
     @signin_decorator
     def delete (self,request,resume_id):
         try: 
