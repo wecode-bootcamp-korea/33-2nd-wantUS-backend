@@ -49,7 +49,6 @@ class KakaoCallBackView(View):
             email             = kakao_email,
             profile_image     = profile_image_url,
             social_id         = Social.objects.get(name="kakao").id,
-            terms_agreements  = {1:2},
         ).save()
 
         user = User.objects.get(social_account_id=kakao_id)
@@ -101,7 +100,6 @@ class GoogleCallBackView(View):
             email             = google_email,
             profile_image     = google_image_url,
             social_id         = Social.objects.get(name="google").id,
-            terms_agreements  = {1:2},
         ).save()
 
         user         = User.objects.get(social_account_id=google_id)
