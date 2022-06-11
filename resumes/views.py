@@ -1,13 +1,12 @@
-import json, boto3, uuid
+import json, uuid, boto3
 
-from django.http  import JsonResponse
+from django.http  import JsonResponse, HttpResponse
 from django.views import View
 
 from resumes.models import Resume
 from my_settings    import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 from core.utils     import signin_decorator
 
-# 파일 업로드
 class ResumeFileUploadView(View):
     s3_client = boto3.client(
         's3',
@@ -40,3 +39,29 @@ class ResumeFileUploadView(View):
 
         except KeyError:
             return JsonResponse({'message' : "KEY_ERROR"}, status=400)
+
+class ResumeView(View):
+    s3_client = boto3.client(
+        's3',
+        aws_access_key_id = AWS_ACCESS_KEY_ID,
+        aws_secret_access_key = AWS_SECRET_ACCESS_KEY
+    )
+    
+    @signin_decorator
+    def delete (self,request, resume_id):
+        try:
+
+            resume    = Resume.objects.get(id=resume_id)
+            key       = resume.file_url 
+            s3_client = boto3.client(
+                's3',
+                aws_access_key_id     = AWS_ACCESS_KEY_ID,
+                aws_secret_access_key = AWS_SECRET_ACCESS_KEY
+            )
+            s3_client.delete_object(Bucket='abstunator-wantus-resume-bucket', Key=key)
+            resume.delete()
+
+            return HttpResponse(204)
+
+        except Resume.DoesNotExist:
+            return JsonResponse({'message' : 'BAD_REQUEST'}, status=404)
