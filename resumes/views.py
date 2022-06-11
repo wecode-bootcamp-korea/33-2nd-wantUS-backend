@@ -65,3 +65,15 @@ class ResumeView(View):
 
         except Resume.DoesNotExist:
             return JsonResponse({'message' : 'BAD_REQUEST'}, status=404)
+    
+# 파일 리스트
+class ResumeListView(View):
+    @signin_decorator
+    def get(self, request):
+
+        results = [{
+            "name"        : resume.name,
+            "created_date": resume.created_at.strftime('%Y.%m.%d')
+        } for resume in Resume.objects.filter(user=request.user)]
+
+        return JsonResponse({"result" : results}, status=200)
