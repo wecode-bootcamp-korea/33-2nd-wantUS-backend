@@ -1,4 +1,3 @@
-import json
 import jwt
 import requests
 
@@ -9,23 +8,13 @@ from django.conf import settings
 
 from users.models import User,Social
 
-class KakaoSignInView(View):
-    def get(self, request):
-        client_id     = settings.KAKAO_CLIENT_ID
-        kakao_auth_id = "https://kauth.kakao.com/oauth/authorize?response_type=code"
-        redirect_uri  = "http://localhost:8000/user/signin/kakao/callback"
-
-        return redirect(
-            f"{kakao_auth_id}&client_id={client_id}&redirect_uri={redirect_uri}"
-            )
-
 class KakaoCallBackView(View):
     def get(self, request):
         kakao_token_api = "https://kauth.kakao.com/oauth/token"
         data = {
             "grant_type"  : "authorization_code",
             "client_id"   : settings.KAKAO_CLIENT_ID,
-            "redirect_uri": "http://localhost:8000/user/signin/kakao/callback",
+            "redirect_uri": "http://localhost:3000/KakaoCallback",
             "code"        : request.GET.get("code")
         }
 
@@ -37,45 +26,31 @@ class KakaoCallBackView(View):
         kakao_email       = user_info["kakao_account"]["email"]
         profile_image_url = user_info["properties"]["profile_image"]
 
-        if User.objects.filter(social_account_id = kakao_id).exists():
-            user = User.objects.get(social_account_id = kakao_id)
-            access_token = jwt.encode({"id" : user.id}, settings.SECRET_KEY, algorithm = settings.ALGORITHM)
-
-            return JsonResponse({"message" : "SIGN IN SUCCESS", "token" : access_token}, status=200)
-        
-        User(
+        user, is_created = User.objects.get_or_create(
             social_account_id = kakao_id,
-            name              = kakao_name,
-            email             = kakao_email,
-            profile_image     = profile_image_url,
-            social_id         = Social.objects.get(name="kakao").id,
-        ).save()
-
-        user = User.objects.get(social_account_id=kakao_id)
-        access_token = jwt.encode({"id" : user.id}, settings.SECRET_KEY, algorithm = settings.ALGORITHM)
-        
-        return JsonResponse({"message" : "ACCOUNT CREATED", "token" : access_token}, status=201)
-
-class GoogleSignInView(View):
-    def get(self, request):
-        client_id       = settings.GOOGLE_CLIENT_ID
-        redirect_uri    = "http://localhost:8000/user/signin/google/callback"
-        scope           = "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile"
-        google_auth_api = "https://accounts.google.com/o/oauth2/v2/auth"
-
-        return redirect(
-            f"{google_auth_api}?scope={scope}&response_type=code&redirect_uri={redirect_uri}&client_id={client_id}"
+            defaults = {
+                "name"         : kakao_name,
+                "email"        : kakao_email,
+                "profile_image": profile_image_url,
+                "social_id"    : Social.objects.get(name="kakao").id
+            }
         )
+        access_token = jwt.encode({"id" : user.id}, settings.SECRET_KEY, algorithm = settings.ALGORITHM)
+
+        if is_created:
+            return JsonResponse({"message" : "ACCOUNT CREATED", "token" : access_token}, status=201)
+        else:
+            return JsonResponse({"message" : "SIGN IN SUCCESS", "token" : access_token}, status=200)
 
 class GoogleCallBackView(View):
     def get(self, request):
         google_token_api = "https://oauth2.googleapis.com/token"
         data = {
-            "code" : request.GET.get("code"),
-            "client_id" : settings.GOOGLE_CLIENT_ID,
-            "client_secret" : settings.GOOGLE_CLIENT_SECRET,
-            "redirect_uri" : "http://localhost:8000/user/signin/google/callback",
-            "grant_type" : "authorization_code"
+            "code"         : request.GET.get("code"),
+            "client_id"    : settings.GOOGLE_CLIENT_ID,
+            "client_secret": settings.GOOGLE_CLIENT_SECRET,
+            "redirect_uri" : "http://localhost:3000/GoogleCallback",
+            "grant_type"   : "authorization_code"
         }
 
         access_token = requests.post(google_token_api, data=data).json()['access_token']
@@ -88,21 +63,55 @@ class GoogleCallBackView(View):
         google_email     = user_info["email"]
         google_image_url = user_info["picture"]
 
-        if User.objects.filter(social_account_id = google_id).exists():
-            user         = User.objects.get(social_account_id = google_id)
-            access_token = jwt.encode({"id" : user.id}, settings.SECRET_KEY, algorithm = settings.ALGORITHM)
-
-            return JsonResponse({"message" : "SIGN IN SUCCESS", "token" : access_token}, status=200)
-        
-        User(
+        user, is_created = User.objects.get_or_create(
             social_account_id = google_id,
-            name              = google_name,
-            email             = google_email,
-            profile_image     = google_image_url,
-            social_id         = Social.objects.get(name="google").id,
-        ).save()
-
-        user         = User.objects.get(social_account_id=google_id)
+            defaults = {
+                "name"         : google_name,
+                "email"        : google_email,
+                "profile_image": google_image_url,
+                "social_id"    : Social.objects.get(name="google").id
+            }
+        )
         access_token = jwt.encode({"id" : user.id}, settings.SECRET_KEY, algorithm = settings.ALGORITHM)
-        
-        return JsonResponse({"message" : "ACCOUNT CREATED", "token" : access_token}, status=201)
+
+        if is_created:
+            return JsonResponse({"message" : "ACCOUNT CREATED", "token" : access_token}, status=201)
+        else:
+            return JsonResponse({"message" : "SIGN IN SUCCESS", "token" : access_token}, status=200)
+
+class NaverCallBackView(View):
+    def get(self, request):
+        naver_token_api = "https://nid.naver.com/oauth2.0/token"
+        data = {
+            "code"         : request.GET.get("code"),
+            "state"        : request.GET.get("state"),
+            "client_id"    : settings.NAVER_CLIENT_ID,
+            "client_secret": settings.NAVER_CLIENT_SECRET,
+            "grant_type"   : "authorization_code"
+        }
+
+        access_token = requests.post(naver_token_api, data=data).json()['access_token']
+        req_uri      = 'https://openapi.naver.com/v1/nid/me'
+        headers      = {'Authorization': f'Bearer {access_token}'}
+
+        user_info       = requests.get(req_uri, headers=headers).json()
+        naver_id        = user_info["response"]["id"]
+        naver_name      = user_info["response"]["name"]
+        naver_email     = user_info["response"]["email"]
+        naver_image_url = user_info["response"]["profile_image"]
+
+        user, is_created = User.objects.get_or_create(
+            social_account_id = naver_id,
+            defaults = {
+                "name"         : naver_name,
+                "email"        : naver_email,
+                "profile_image": naver_image_url,
+                "social_id"    : Social.objects.get(name="naver").id
+            }
+        )
+        access_token = jwt.encode({"id" : user.id}, settings.SECRET_KEY, algorithm = settings.ALGORITHM)
+
+        if is_created:
+            return JsonResponse({"message" : "ACCOUNT CREATED", "token" : access_token}, status=201)
+        else:
+            return JsonResponse({"message" : "SIGN IN SUCCESS", "token" : access_token}, status=200)
