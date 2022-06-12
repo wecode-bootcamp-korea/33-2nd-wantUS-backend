@@ -178,3 +178,71 @@ class GoogleSignInTest(TestCase):
             'message': 'SIGN IN SUCCESS', 
             'token': jwt.encode({'id': User.objects.latest('id').id}, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
         })
+
+class NaverSignInTest(TestCase):
+    def setUp(self): 
+        Social.objects.create(
+            id   = 3,
+            name = 'naver'
+        )
+        User.objects.create(
+            id                = 1,
+            name              = '이소룡',
+            profile_image     = 'https://lh3.googleusercontent.com/a/AATXAJyJ31Yj38kTInJgJ4ducCl6Wx-QlX49FzQh0kF9=s96-c',
+            email             = 'gogolee@gmail.com',
+            social_account_id = '5544332211',
+            social_id         = Social.objects.get(name="naver").id,
+        )
+
+    def tearDown(self):
+        User.objects.all().delete()
+
+    @patch("users.views.requests")
+    def test_success_google_new_user(self, mocked_requests):
+        client = Client()
+
+        class MockedResponse:
+            def json(self):
+                return {
+                    "response": {
+                        "id"           : "123123123",
+                        "name"         : "김아리",
+                        "profile_image": "https://lh3.googleusercontent.com/a/AFFEASSSXXDFAEucCl6Wx-QlX49FzQh0kF9=s96-c",
+                        "email"        : "lululala@gmail.com",
+                    }
+                }
+
+        mocked_requests.get = mock.MagicMock(return_value = MockedResponse())
+        headers             = {"HTTP_Authorization" : "11223344"}
+        response            = client.get("/user/signin/naver/callback", **headers)
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), {
+            'message': 'ACCOUNT CREATED',
+            'token'  : jwt.encode({'id': User.objects.latest('id').id}, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+        })     
+
+    @patch("users.views.requests")
+    def test_success_kakao_existed_user(self, mocked_requests):
+        client = Client()
+
+        class MockedResponse:
+            def json(self):
+                return {
+                    "response": {
+                        "id"           : "5544332211",
+                        "name"         : "이소룡",
+                        "profile_image": "https://lh3.googleusercontent.com/a/AFFEASSSXXDFAEucCl6Wx-QlX49FzQh0kF9=s96-c",
+                        "email"        : "gogolee@gmail.com",
+                    }
+                }
+
+        mocked_requests.get = mock.MagicMock(return_value = MockedResponse())
+        headers = {"HTTP_Authorization" : "12345678"}
+        response = client.get("/user/signin/naver/callback", **headers)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
+            'message': 'SIGN IN SUCCESS', 
+            'token': jwt.encode({'id': User.objects.latest('id').id}, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+        })
