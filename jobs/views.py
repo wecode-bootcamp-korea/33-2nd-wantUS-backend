@@ -4,6 +4,7 @@ from django.http  import JsonResponse
 from django.views import View
 
 from jobs.models import *
+from users.models import *
 from core.utils  import signin_decorator
 
 class JobDetailView(View):
@@ -38,3 +39,24 @@ class JobDetailView(View):
 
         except Job.DoesNotExist:
             return JsonResponse({"message" : "JOB_DOES_NOT_EXIST"}, status=404)
+
+class FollowView(View):
+    @signin_decorator
+    def post(self, request, job_id):
+        user   = request.user
+
+        if Follow.objects.filter(user_id = user.id, job_id = job_id).exists(): 
+            Follow.objects.get(user_id = user.id, job_id=job_id).delete()
+            results = False
+            message = "FOLLOW_DELETE"
+
+        else:
+            Follow.objects.create(
+                user_id = user.id,
+                job_id  = job_id,
+            )
+            results = True
+            message = "FOLLOW_SUCCESS"
+        
+        follow_count = Follow.objects.filter(job_id=job_id).count()
+        return JsonResponse({"message" : message, "results" : results, "follow_count" : follow_count}, status =200)
