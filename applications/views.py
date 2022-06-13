@@ -22,7 +22,8 @@ class ApplicationResultView(View):
         user_info = {
             "id"   : user.id,
             "name" : user.name,
-            "email": user.email
+            "email": user.email,
+            "image" : user.profile_image
         }
 
         return JsonResponse({"application_results" : application_results, "user_info" : user_info}, status=200)
