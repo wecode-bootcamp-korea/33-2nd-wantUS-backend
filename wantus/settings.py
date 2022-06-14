@@ -168,27 +168,17 @@ LOGGING = {
 KAKAO_CLIENT_ID         = KAKAO_CLIENT_ID
 GOOGLE_CLIENT_ID        = GOOGLE_CLIENT_ID
 GOOGLE_CLIENT_SECRET    = GOOGLE_CLIENT_SECRET
+NAVER_CLIENT_ID         = NAVER_CLIENT_ID
+NAVER_CLIENT_SECRET     = NAVER_CLIENT_SECRET
+
 AWS_ACCESS_KEY_ID       = AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY   = AWS_SECRET_ACCESS_KEY
 AWS_STORAGE_BUCKET_NAME = 'abstunator-wantus-resume-bucket'
 AWS_S3_FILE_OVERWRITE   = False
 AWS_DEFAULT_ACL         = None
-DEFAULT_FILE_STORAGE    = 'storages.backends.s3boto3.S3Boto3Storage'
-STATICFILES_STORAGE     = 'storages.backends.s3boto3.S3Boto3Storage'
-S3_URI                  = S3_URI
 
-AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL       = None
 DEFAULT_FILE_STORAGE  = 'storages.backends.s3boto3.S3Boto3Storage'
 STATICFILES_STORAGE   = 'storages.backends.s3boto3.S3Boto3Storage'
-NAVER_CLIENT_ID       = NAVER_CLIENT_ID
-NAVER_CLIENT_SECRET   = NAVER_CLIENT_SECRET
 
-AWS_ACCESS_KEY_ID       = AWS_ACCESS_KEY_ID
-AWS_SECRET_ACCESS_KEY   = AWS_SECRET_ACCESS_KEY
-AWS_STORAGE_BUCKET_NAME = 'abstunator-wantus-resume-bucket'
-AWS_S3_FILE_OVERWRITE   = False
-AWS_DEFAULT_ACL         = None
-DEFAULT_FILE_STORAGE    = 'storages.backends.s3boto3.S3Boto3Storage'
-STATICFILES_STORAGE     = 'storages.backends.s3boto3.S3Boto3Storage'
-S3_URI                  = S3_URI
+S3_URI                = S3_URI
+
