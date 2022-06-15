@@ -13,19 +13,18 @@ class ResumeFileUploadView(View):
         's3',
         aws_access_key_id     = AWS_ACCESS_KEY_ID,
         aws_secret_access_key = AWS_SECRET_ACCESS_KEY
-        )
+    )
     @signin_decorator
     def post (self, request):
         try:
-            user      = request.user
-            file      = request.FILES['resume']
-            file_uuid = str(uuid.uuid4())
-            file_url  = f"https://abstunator-wantus-resume-bucket.s3.us-west-2.amazonaws.com/{file_uuid}"
+            user = request.user
+            file = request.FILES['resume']
+            key  = str(uuid.uuid4())
 
             self.s3_client.upload_fileobj(
                 file,
                 "abstunator-wantus-resume-bucket",
-                file_uuid,
+                key,
                 ExtraArgs = {
                     "ContentType" : file.content_type
                 }
@@ -33,7 +32,7 @@ class ResumeFileUploadView(View):
 
             Resume.objects.create(
                 name     = file.name,
-                file_url = file_url,
+                file_url = key,
                 user     = user
             )
             
@@ -41,5 +40,3 @@ class ResumeFileUploadView(View):
 
         except KeyError:
             return JsonResponse({'message' : "KEY_ERROR"}, status=400)
-
-
