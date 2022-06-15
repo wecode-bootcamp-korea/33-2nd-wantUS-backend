@@ -60,3 +60,17 @@ class FollowView(View):
         
         follow_count = Follow.objects.filter(job_id=job_id).count()
         return JsonResponse({"message" : message, "results" : results, "follow_count" : follow_count}, status =200)
+
+class FollowedJobView(View):
+    @signin_decorator
+    def get(self, request):
+        user = request.user
+        follows = Follow.objects.select_related('job', 'job__company', 'job__company__location').filter(user_id = user.id)
+        followed_jobs = [{
+            'position' : follow.job.name,
+            'company_name' : follow.job.company.name,
+            'location' : follow.job.company.location.name,
+            'image' : follow.job.company.companyimage_set.first().image_url
+        } for follow in follows]
+
+        return JsonResponse({"results" : followed_jobs}, status=200)
