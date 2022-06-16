@@ -34,7 +34,7 @@ class ResumeFileUploadView(View):
                 file_url = key,
                 user     = user
             )
-            
+
             return JsonResponse({'message' : 'UPLOAD_SUCCESS'}, status=201) 
 
         except KeyError:
@@ -72,6 +72,8 @@ class ResumeListView(View):
     def get(self, request):
 
         results = [{
+            "id" : resume.id,
+            "user" : resume.user.name,
             "name"        : resume.name,
             "created_date": resume.created_at.strftime('%Y.%m.%d')
         } for resume in Resume.objects.filter(user=request.user)]
