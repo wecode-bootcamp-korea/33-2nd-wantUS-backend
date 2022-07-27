@@ -2,14 +2,11 @@ import json
 
 from django.http      import JsonResponse
 from django.views     import View
-from django.db.models import (
-    Count,
-    Q
-)
+from django.db.models import Count, Q
 
-from jobs.models import *
+from jobs.models  import *
 from users.models import *
-from core.utils import signin_decorator
+from core.utils   import signin_decorator
 
 class JobListPrivateView(View):
     @signin_decorator
