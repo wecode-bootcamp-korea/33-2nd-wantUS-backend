@@ -2,9 +2,9 @@ import jwt
 import requests
 
 from django.shortcuts import redirect
-from django.views import View
-from django.http import JsonResponse
-from django.conf import settings
+from django.views     import View
+from django.http      import JsonResponse
+from django.conf      import settings
 
 from users.models import User,Social
 
